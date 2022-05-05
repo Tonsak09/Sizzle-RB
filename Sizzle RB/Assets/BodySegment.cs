@@ -15,10 +15,10 @@ public class BodySegment : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         this.transform.position = (front.position + back.position) / 2;
         this.transform.LookAt(front);
     }
+
 }

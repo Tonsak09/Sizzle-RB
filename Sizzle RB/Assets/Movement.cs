@@ -6,6 +6,7 @@ public class Movement : MonoBehaviour
 {
 
     private Rigidbody rb;
+    private PointJoint pj; // Every movement should have a PJ but not every PJ needs a movement 
 
     public float speed;
     public float rotSpeed;
@@ -13,10 +14,14 @@ public class Movement : MonoBehaviour
     // Represents rotation on xz plane 
     private Vector3 direction;
 
+    public Vector3 Direction { get { return direction; } }
+
     // Start is called before the first frame update
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
+        pj = this.GetComponent<PointJoint>();
+
         direction = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
 
     }
@@ -24,10 +29,17 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        RaycastHit hit;
+        Physics.Raycast(this.transform.position, Vector3.down, out hit, pj.floorOffset, pj.mask);
+        //direction = Vector3.ProjectOnPlane(direction, hit.normal);
 
-        if(Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W))
         {
             rb.AddForce(speed * direction * Time.deltaTime, ForceMode.Force);
+        }
+        else if(Input.GetKey(KeyCode.S))
+        {
+            rb.AddForce(-speed * direction * Time.deltaTime, ForceMode.Force);
         }
         
 
@@ -35,12 +47,13 @@ public class Movement : MonoBehaviour
         {
             //rb.AddTorque(rotSpeed * Vector3.up * Time.deltaTime, ForceMode.Force);
             direction = Maths.RotateVectorXZ(direction, -rotSpeed * Time.deltaTime);
-            
+            rb.velocity = Vector3.Project(rb.velocity, direction);
         }
         else if (Input.GetKey(KeyCode.A))
         {
             //rb.AddTorque(-rotSpeed * Vector3.up * Time.deltaTime, ForceMode.Force);
             direction = Maths.RotateVectorXZ(direction, rotSpeed * Time.deltaTime);
+            rb.velocity = Vector3.Project(rb.velocity, direction);
         }
     }
 
