@@ -8,6 +8,10 @@ public class Movement : MonoBehaviour
     private Rigidbody rb;
     private PointJoint pj; // Every movement should have a PJ but not every PJ needs a movement 
 
+    public KeyCode forward;
+    public KeyCode left;
+    public KeyCode right;
+
     public float speed;
     public float rotSpeed;
 

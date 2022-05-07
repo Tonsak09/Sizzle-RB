@@ -5,10 +5,13 @@ public class FollowTheLeader : MonoBehaviour
 
     public Rigidbody[] bodySegments;
     public float followSpeed;
+    public float followForce;
 
     private float[] chainDistances;
 
+    public LayerMask terrain;
 
+    public float moveForce;
     public float moveSpeed;
     public float rotateSpeed;
 
@@ -34,8 +37,11 @@ public class FollowTheLeader : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HeadMove();
-        UpdateSegments();
+        RaycastHit hit;
+        Physics.Raycast(this.transform.position, Vector3.down, out hit, 10, terrain);
+
+        HeadMove(hit);
+        UpdateSegments(hit);
 
     }
 
@@ -44,11 +50,11 @@ public class FollowTheLeader : MonoBehaviour
     /// Checks if any part of the body chain needs to be updated
     /// with its position 
     /// </summary>
-    private void UpdateSegments()
+    private void UpdateSegments(RaycastHit hit)
     {
         for (int i = 1; i < bodySegments.Length; i++)
         {
-            bodySegments[i].transform.LookAt(bodySegments[i - 1].transform.position, Vector3.up);
+            //bodySegments[i].transform.LookAt(bodySegments[i - 1].transform.position, Vector3.up);
 
             // Direction from current to parent 
             Vector3 dir = bodySegments[i - 1].transform.position - bodySegments[i].transform.position;
@@ -61,10 +67,12 @@ public class FollowTheLeader : MonoBehaviour
             if(dir.magnitude < target.magnitude)
             {
                 bodySegments[i].transform.position = target;
+                //bodySegments[i].velocity = Vector3.zero;
             }
             else if (!EqualWithinRange(dir.magnitude, chainDistances[i], 0.1f))
             {
-                bodySegments[i].velocity = (target - bodySegments[i].transform.position).normalized * followSpeed * Time.deltaTime;
+                //bodySegments[i].velocity = (target - bodySegments[i].transform.position).normalized * followSpeed * Time.deltaTime;
+                bodySegments[i].AddForce((target - bodySegments[i].transform.position).normalized * followForce * Time.deltaTime, ForceMode.Acceleration);
             }
         }
     }
@@ -72,14 +80,13 @@ public class FollowTheLeader : MonoBehaviour
     /// <summary>
     /// Moves the head around using rigidbody velocities 
     /// </summary>
-    private void HeadMove()
+    private void HeadMove(RaycastHit hit)
     {
         if (Input.GetKey(KeyCode.W))
         {
-            RaycastHit hit;
-            Physics.Raycast(this.transform.position, Vector3.down, out hit);
-
-            rb.velocity = rb.velocity + moveSpeed * Vector3.ProjectOnPlane(this.transform.forward, hit.normal).normalized * Time.deltaTime;
+            
+            //rb.velocity = moveSpeed * Vector3.ProjectOnPlane(this.transform.forward, hit.normal) * Time.deltaTime;
+            rb.AddForce(moveForce * Vector3.ProjectOnPlane(this.transform.forward, hit.normal) * Time.deltaTime, ForceMode.Acceleration);
         }
 
         if (Input.GetAxis("Horizontal") != 0)
@@ -90,7 +97,7 @@ public class FollowTheLeader : MonoBehaviour
 
     /// <summary>
     /// Checks if a given value is equal to a check within a certain tolerance 
-    /// </summary>
+    /// </summary>W
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="tolerance"></param>
@@ -103,7 +110,7 @@ public class FollowTheLeader : MonoBehaviour
     private void OnDrawGizmos()
     {
         RaycastHit hit;
-        Physics.Raycast(this.transform.position, Vector3.down, out hit);
+        Physics.Raycast(this.transform.position, Vector3.down, out hit, 10, terrain);
 
         Vector3 forward = Vector3.ProjectOnPlane(this.transform.forward, hit.normal);
 

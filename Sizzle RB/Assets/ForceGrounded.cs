@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KeepGrounded : MonoBehaviour
+public class ForceGrounded : MonoBehaviour
 {
+
+    public LayerMask mask;
+
     public float maxDisFromGround;
     public float downwardForce;
 
@@ -17,7 +20,7 @@ public class KeepGrounded : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!Physics.Raycast(this.transform.position, Vector3.down, maxDisFromGround))
+        if(!Physics.Raycast(this.transform.position, Vector3.down, maxDisFromGround, mask))
         {
             rb.AddForce(downwardForce * Vector3.down * Time.deltaTime, ForceMode.Acceleration);
         }

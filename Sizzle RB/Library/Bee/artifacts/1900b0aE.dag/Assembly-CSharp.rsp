@@ -335,7 +335,7 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEditor.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/VSSettingsProvider.ref.dll"
-"Assets/KeepGrounded.cs"
+"Assets/ForceGrounded.cs"
 "Assets/Scripts/SimpleCameraController.cs"
 "Assets/Sizzle Scripts/BodySegment.cs"
 "Assets/Sizzle Scripts/Head.cs"
@@ -344,6 +344,7 @@
 "Assets/Sizzle Scripts/Movement.cs"
 "Assets/Sizzle Scripts/PointJoint.cs"
 "Assets/Sizzle Scripts/Snake/FollowTheLeader.cs"
+"Assets/StickToGround.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
 -langversion:8.0
 
