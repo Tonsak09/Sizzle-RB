@@ -4,7 +4,6 @@ public class FollowTheLeader : MonoBehaviour
 {
 
     public Rigidbody[] bodySegments;
-    public float followSpeed;
     public float followForce;
 
     private float[] chainDistances;
@@ -12,7 +11,6 @@ public class FollowTheLeader : MonoBehaviour
     public LayerMask terrain;
 
     public float moveForce;
-    public float moveSpeed;
     public float rotateSpeed;
 
     private Rigidbody rb;
@@ -54,7 +52,7 @@ public class FollowTheLeader : MonoBehaviour
     {
         for (int i = 1; i < bodySegments.Length; i++)
         {
-            //bodySegments[i].transform.LookAt(bodySegments[i - 1].transform.position, Vector3.up);
+            bodySegments[i].transform.LookAt(bodySegments[i - 1].transform.position, Vector3.up);
 
             // Direction from current to parent 
             Vector3 dir = bodySegments[i - 1].transform.position - bodySegments[i].transform.position;
@@ -67,11 +65,9 @@ public class FollowTheLeader : MonoBehaviour
             if(dir.magnitude < target.magnitude)
             {
                 bodySegments[i].transform.position = target;
-                //bodySegments[i].velocity = Vector3.zero;
             }
             else if (!EqualWithinRange(dir.magnitude, chainDistances[i], 0.1f))
             {
-                //bodySegments[i].velocity = (target - bodySegments[i].transform.position).normalized * followSpeed * Time.deltaTime;
                 bodySegments[i].AddForce((target - bodySegments[i].transform.position).normalized * followForce * Time.deltaTime, ForceMode.Acceleration);
             }
         }
@@ -85,7 +81,6 @@ public class FollowTheLeader : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             
-            //rb.velocity = moveSpeed * Vector3.ProjectOnPlane(this.transform.forward, hit.normal) * Time.deltaTime;
             rb.AddForce(moveForce * Vector3.ProjectOnPlane(this.transform.forward, hit.normal) * Time.deltaTime, ForceMode.Acceleration);
         }
 
