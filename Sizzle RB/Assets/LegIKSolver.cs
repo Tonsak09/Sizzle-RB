@@ -25,14 +25,17 @@ public class LegIKSolver : MonoBehaviour
     private Vector3 axisVector { get { return axisFront.position - axisBack.position; } }
     private Vector3 root { get { return axisBack.position + (axisVector * percentAlong); } }
 
-    public Vector3 offset;
-    public Vector3 offsetedRoot { get { return root + (axisVector.normalized * offset.z) + (axisBack.up * offset.y + axisBack.right * offset.x); } }
+    public Vector3 rootOffset;
+    public Vector3 offsetedRoot { get { return root + (axisVector.normalized * rootOffset.z) + (axisBack.up * rootOffset.y + axisBack.right * rootOffset.x); } }
 
     public Vector3 IKOffset;
     private Vector3 offsetedIK { get { return root + (axisVector.normalized * IKOffset.z) + (axisBack.up * IKOffset.y + axisBack.right * IKOffset.x); } }
 
     public Vector3 IKHintOffset;
     private Vector3 offsetedIKHint { get { return root + (axisVector.normalized * IKHintOffset.z) + (axisBack.up * IKHintOffset.y + axisBack.right * IKHintOffset.x); } }
+
+    public Vector3 startoffset;
+    private Vector3 offsetedStart { get { return root + (axisVector.normalized * startoffset.z) + (axisBack.up * startoffset.y + axisBack.right * startoffset.x); } }
 
     // Moving info
     public float stepDistance;
@@ -44,11 +47,13 @@ public class LegIKSolver : MonoBehaviour
 
     public LegIKSolver opposite;
     public float Lerp { get { return lerp; } }
+    public bool finished;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        target = offsetedStart;
+        lerp = 0;
     }
 
     // Update is called once per frame
@@ -59,36 +64,46 @@ public class LegIKSolver : MonoBehaviour
 
         RaycastHit hit;
 
-        if(lerp >= 1 )
+        
+        if(opposite.finished)
         {
-            if (Physics.Raycast(offsetedRoot + Vector3.one * Random.Range(-randRange, randRange), Vector3.down, out hit, MaxDisFromFloor, mask))
+            if (lerp >= 1)
             {
-                if (Vector3.Distance(hit.point, target) > stepDistance)
+                if (Physics.Raycast(offsetedRoot + Vector3.one * Random.Range(-randRange, randRange), Vector3.down, out hit, MaxDisFromFloor, mask))
                 {
-                    lerp = 0;
-                    origin = end.transform.position;
-                    target = hit.point;
-                }
-                else
-                {
-                    end.position = origin;
+                    if (Vector3.Distance(hit.point, target) > stepDistance)
+                    {
+                        lerp = 0;
+                        //origin = end.transform.position;
+                        target = hit.point;
+                        //finished = false;
+                    }
+                    else
+                    {
+                        end.position = origin;
+                    }
                 }
             }
-        }
+
+            if (lerp <= 1)
+            {
+                Vector3 footPos = Vector3.Lerp(origin, target, lerp);
+                footPos.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
+
+                end.position = footPos;
+                lerp += Time.deltaTime * speed;
+            }
+            else
+            {
+                end.transform.position = target;
+                origin = target;
+                //finished = true;
+            }
+        }    
+            
         
 
-        if(lerp < 1)
-        {
-            Vector3 footPos = Vector3.Lerp(origin, target, lerp);
-            footPos.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
-
-            end.position = footPos;
-            lerp += Time.deltaTime * speed;
-        }
-        else
-        {
-            origin = target;
-        }
+        
 
     }
 
@@ -107,5 +122,8 @@ public class LegIKSolver : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(target, 0.5f);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(offsetedStart, 0.1f);
     }
 }

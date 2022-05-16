@@ -17,7 +17,6 @@ public class FollowTheLeader : MonoBehaviour
 
 
 
-
     // Start is called before the first frame update
     void Start()
     {
