@@ -28,7 +28,8 @@ public class FollowTheLeader : MonoBehaviour
         {
             chainDistances[i] = Vector3.Distance(bodySegments[i].transform.position, bodySegments[i - 1].transform.position);
         }
-
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame

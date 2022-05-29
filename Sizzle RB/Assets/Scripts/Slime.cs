@@ -19,6 +19,7 @@ public class Slime : MonoBehaviour
 
     public float distance;
     public float speed;
+    public float fallSpeed;
 
     private enum SlimeStates { idle, moving}
 
@@ -49,6 +50,16 @@ public class Slime : MonoBehaviour
 
     private void IdleState()
     {
+        RaycastHit hit;
+        if (!Physics.Raycast(this.transform.position, Vector3.down, out hit, this.transform.localScale.y, terrainMask))
+        {
+            target = this.transform.position - Vector3.up * this.transform.localScale.y;
+            origin = this.transform.position;
+            state = SlimeStates.moving;
+
+            return;
+        }
+
         Vector3 xPos = center + new Vector3(this.transform.localScale.x + detectRange, this.transform.localScale.y / 2, this.transform.localScale.z / 2);
         Vector3 xNeg = center + new Vector3(-(detectRange), this.transform.localScale.y / 2, this.transform.localScale.z / 2);
         CheckDirection(xPos, xNeg);
@@ -58,6 +69,9 @@ public class Slime : MonoBehaviour
         Vector3 zNeg = center + new Vector3(this.transform.localScale.x / 2, this.transform.localScale.y / 2, -detectRange);
         CheckDirection(zPos, zNeg);
         CheckDirection(zNeg, zPos);
+
+        
+
     }
 
     private void CheckDirection(Vector3 CheckDirection, Vector3 opposite)
