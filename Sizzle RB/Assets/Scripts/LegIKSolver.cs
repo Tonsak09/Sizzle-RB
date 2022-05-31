@@ -47,7 +47,7 @@ public class LegIKSolver : MonoBehaviour
 
     public LegIKSolver opposite;
     public float Lerp { get { return lerp; } }
-    public bool finished;
+    public bool Moving;
 
     // Start is called before the first frame update
     void Start()
@@ -62,53 +62,55 @@ public class LegIKSolver : MonoBehaviour
         IKStart.position = offsetedIK;
         IKHint.position = offsetedIKHint;
 
+    }
+
+    public void TryMove()
+    {
+        if(Moving)
+        {
+            return;
+        }
+
         RaycastHit hit;
 
-        
-        if(opposite.finished)
+        // Checking for new position 
+        if (Physics.Raycast(offsetedRoot + Vector3.one * Random.Range(-randRange, randRange), Vector3.down, out hit, MaxDisFromFloor, mask))
         {
-            if (lerp >= 1)
+            // New position found 
+            if (Vector3.Distance(hit.point, target) > stepDistance)
             {
-                // Checking for new position 
-                if (Physics.Raycast(offsetedRoot + Vector3.one * Random.Range(-randRange, randRange), Vector3.down, out hit, MaxDisFromFloor, mask))
-                {
-                    // New position found 
-                    if (Vector3.Distance(hit.point, target) > stepDistance)
-                    {
-                        lerp = 0;
-                        //origin = end.transform.position;
-                        target = hit.point;
-                        //finished = false;
-                    }
-                    else
-                    {
-                        end.position = origin;
-                    }
-                }
-            }
+                lerp = 0;
+                //origin = end.transform.position;
+                target = hit.point;
 
-            if (lerp <= 1)
-            {
-                // Moves smoothly to new point 
-                Vector3 footPos = Vector3.Lerp(origin, target, lerp);
-                footPos.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
-
-                end.position = footPos;
-                lerp += Time.deltaTime * speed;
+                StartCoroutine(Move());
             }
             else
             {
-                // Once point is reached 
-                end.transform.position = target;
-                origin = target;
-                //finished = true;
+                end.position = origin;
             }
-        }    
-            
-        
+        }
+    }
 
-        
+    private IEnumerator Move()
+    {
+        Moving = true;
 
+        while(lerp <= 1)
+        {
+            // Moves smoothly to new point 
+            Vector3 footPos = Vector3.Lerp(origin, target, lerp);
+            footPos.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
+
+            end.position = footPos;
+            lerp += Time.deltaTime * speed;
+            yield return null;
+        }
+
+        // Once point is reached 
+        end.transform.position = target;
+        origin = target;
+        Moving = false;
     }
 
     private void OnDrawGizmos()

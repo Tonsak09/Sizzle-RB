@@ -351,6 +351,7 @@
 "Assets/Scripts/ForceGrounded.cs"
 "Assets/Scripts/Grab.cs"
 "Assets/Scripts/LegIKSolver.cs"
+"Assets/Scripts/LegsController.cs"
 "Assets/Scripts/MinFromGround.cs"
 "Assets/Scripts/PressurePlate.cs"
 "Assets/Scripts/SimpleCameraController.cs"
